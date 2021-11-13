@@ -4,6 +4,7 @@ const cors = require('cors');
 const port = process.env.PORT || 5000;
 // require dotenv file 
 require('dotenv').config();
+const ObjectId = require('mongodb').ObjectId;
 
 // Connect app with mongoDB database
 const { MongoClient } = require('mongodb');
@@ -56,8 +57,10 @@ async function run() {
         });
         // GET API(orders)
         app.get('/orders', async (req, res) => {
-            const cursor = orderCollection.find({});
-            const orders = await cursor.limit(10).toArray();
+            const email = req.query.email;
+            const query = { email: email };
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
             res.send(orders);
 
         });
@@ -72,7 +75,7 @@ async function run() {
         // GET API(blogs)
         app.get('/blogs', async (req, res) => {
             const cursor = blogCollection.find({});
-            const blogs = await cursor.limit(10).toArray();
+            const blogs = await cursor.limit(6).toArray();
             res.send(blogs);
 
         });
@@ -93,6 +96,15 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const product = await productCollection.findOne(query);
             res.json(product);
+        })
+
+        //Delete API(order)
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('deleting specific id');
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(query);
+            res.json(result);
         })
     }
     finally {
