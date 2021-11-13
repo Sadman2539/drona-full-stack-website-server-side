@@ -25,6 +25,7 @@ async function run() {
         const productCollection = database.collection("products");
         const reviewCollection = database.collection("reviews");
         const blogCollection = database.collection("blogs");
+        const usersCollection = database.collection("users");
 
 
         //GET API (Products)
@@ -106,6 +107,31 @@ async function run() {
             const result = await orderCollection.deleteOne(query);
             res.json(result);
         })
+
+        // post new Users
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            console.log(result);
+            res.json(result);
+        });
+        // PUT new Users
+        app.put('/users', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const options = { upsert: true };
+            const updatedUser = { $set: user };
+            const result = await usersCollection.updateOne(filter, updatedUser, options);
+            res.json(result);
+        });
+        // GET  Users
+        app.get('/users', async (req, res) => {
+            const cursor = usersCollection.find({});
+            const users = await cursor.toArray();
+            res.send(users);
+
+        });
+
     }
     finally {
         // await client.close();
