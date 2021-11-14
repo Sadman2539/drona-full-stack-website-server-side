@@ -31,7 +31,7 @@ async function run() {
         //GET API (Products)
         app.get('/explore', async (req, res) => {
             const cursor = productCollection.find({});
-            const products = await cursor.limit(10).toArray();
+            const products = await cursor.toArray();
             res.send(products);
 
         });
@@ -107,6 +107,19 @@ async function run() {
             const result = await orderCollection.deleteOne(query);
             res.json(result);
         })
+        // FIND  ADMIN 
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            let isAdmin = false;
+            if (user?.role === 'admin') {
+                isAdmin = true;
+            }
+
+            res.json({ admin: isAdmin });
+        });
+
 
         // post new Users
         app.post('/users', async (req, res) => {
@@ -122,6 +135,14 @@ async function run() {
             const options = { upsert: true };
             const updatedUser = { $set: user };
             const result = await usersCollection.updateOne(filter, updatedUser, options);
+            res.json(result);
+        });
+        // PUT ADMIN 
+        app.put('/users/admin', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const updatedUser = { $set: { role: 'admin' } };
+            const result = await usersCollection.updateOne(filter, updatedUser);
             res.json(result);
         });
         // GET  Users
