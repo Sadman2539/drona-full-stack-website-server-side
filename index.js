@@ -63,13 +63,13 @@ async function run() {
             res.send(products);
 
         });
-        // post all Products
+        // post Single Product
         app.post('/explore', async (req, res) => {
             const product = req.body;
-            const result = await orderCollection.insertOne(product);
-            console.log(result);
+            const result = await productCollection.insertOne(product);
             res.json(result);
         });
+
         //GET API (Reviews)
         app.get('/reviews', async (req, res) => {
             const cursor = reviewCollection.find({});
@@ -77,12 +77,19 @@ async function run() {
             res.send(reviews);
 
         });
-        // post all Reviews
+        // post single Review
         app.post('/reviews', async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
-            console.log(result);
             res.json(result);
+        });
+        // GET ALL (orders)
+        app.get('/orders', async (req, res) => {
+            const cursor = orderCollection.find({});
+            const orders = await cursor.toArray();
+            res.send(orders);
+
+
         });
         // GET API(orders)
         app.get('/orders', async (req, res) => {
