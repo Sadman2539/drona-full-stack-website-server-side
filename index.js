@@ -2,15 +2,15 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 5000;
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 
 // drona-firebase-adminsdk.json
 
-var serviceAccount = require("./drona-firebase-adminsdk.json");
+// var serviceAccount = require("./drona-firebase-adminsdk.json");
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
+// admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount)
+// });
 // require dotenv file 
 require('dotenv').config();
 const ObjectId = require('mongodb').ObjectId;
@@ -28,22 +28,22 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 
 // verifyToken function call to verify token
-async function verifyToken(req, res, next) {
-    if (req.headers?.authorization?.startWith('Bearer ')) {
-        const token = req.headers.authorization.split('Bearer ')[1];
-        try {
-            const decodedUser = await admin.auth().verifyIdToken(token);
-            req.decodedEmail = decodedUser.email;
-        } catch (error) {
-            res.status(401).send('Unauthorized');
-        }
-        next();
+// async function verifyToken(req, res, next) {
+//     if (req.headers?.authorization?.startsWith('Bearer ')) {
+//         const token = req.headers.authorization.split(' ')[1];
+//         try {
+//             const decodedUser = await admin.auth().verifyIdToken(token);
+//             req.decodedEmail = decodedUser.email;
+//         } catch (error) {
+//             res.status(401).send('Unauthorized');
+//         }
+//         next();
 
-    }
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    return decodedToken;
-    next();
-}
+//     }
+//     const decodedToken = await admin.auth().verifyIdToken(token);
+//     return decodedToken;
+//     next();
+// }
 
 async function run() {
     try {
@@ -176,25 +176,26 @@ async function run() {
         // PUT ADMIN 
         app.put('/users/admin', async (req, res) => {
             const user = req.body;
-            const requester = req.decodedEmail;
-            console.log(req.headers.authorization);
-            if (requester) {
-                const requesterAccount = await usersCollection.findOne({ email: requester });
-                if (requesterAccount.role === 'admin') {
-                    const filter = { email: user.email };
-                    const updatedUser = { $set: { role: 'admin' } };
-                    const result = await usersCollection.updateOne(filter, updatedUser);
-                    res.json(result);
-
-                }
+            const filter = { email: user.email };
+            const updatedUser = { $set: { role: 'admin' } };
+            const result = await usersCollection.updateOne(filter, updatedUser);
+            res.json(result);
+            // const requester = req.decodedEmail;
+            // console.log(req.decodedEmail);
+            // if (requester) {
+            //     const requesterAccount = await usersCollection.findOne({ email: requester });
+            //     if (requesterAccount.role === 'admin') {
 
 
-            }
-            else {
-                res.status(403).json({
-                    message: "You don't have access to make an admin"
-                });
-            }
+            //     }
+
+
+            // }
+            // else {
+            //     res.status(403).json({
+            //         message: "You don't have access to make an admin"
+            //     });
+            // }
 
         });
 
