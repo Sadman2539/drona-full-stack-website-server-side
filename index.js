@@ -174,9 +174,10 @@ async function run() {
             res.json(result);
         });
         // PUT ADMIN 
-        app.put('/users/admin', verifyToken, async (req, res) => {
+        app.put('/users/admin', async (req, res) => {
             const user = req.body;
             const requester = req.decodedEmail;
+            console.log(req.headers.authorization);
             if (requester) {
                 const requesterAccount = await usersCollection.findOne({ email: requester });
                 if (requesterAccount.role === 'admin') {
