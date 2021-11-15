@@ -56,13 +56,23 @@ async function run() {
         const usersCollection = database.collection("users");
 
 
-        //GET API (Products)
+        //GET API (ALL Products)
         app.get('/explore', async (req, res) => {
             const cursor = productCollection.find({});
             const products = await cursor.toArray();
             res.send(products);
 
         });
+
+        //GET Single Product 
+        app.get('/purchase/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('getting specific id');
+            const query = { _id: ObjectId(id) };
+            const product = await productCollection.findOne(query);
+            res.json(product);
+        })
+
         // post Single Product
         app.post('/explore', async (req, res) => {
             const product = req.body;
@@ -125,14 +135,7 @@ async function run() {
         });
 
 
-        //GET Single Product 
-        app.get('/purchase/:id', async (req, res) => {
-            const id = req.params.id;
-            console.log('getting specific id');
-            const query = { _id: ObjectId(id) };
-            const product = await productCollection.findOne(query);
-            res.json(product);
-        })
+
 
         //Delete API(order)
         app.delete('/orders/:id', async (req, res) => {
@@ -142,6 +145,15 @@ async function run() {
             const result = await orderCollection.deleteOne(query);
             res.json(result);
         })
+        //Delete API(Product)
+        app.delete('/explore/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('deleting specific id');
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(query);
+            res.json(result);
+        })
+
 
 
 
